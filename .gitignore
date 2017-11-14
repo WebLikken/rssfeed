@@ -1,1 +1,3 @@
 ./rss-feed-app/node_modules
+.idea/
+rssfeed.iml
