@@ -1,0 +1,9 @@
+'use strict';
+const uuid = require('uuid');
+const User = require(__base + '/model/User').User;
+
+let create = function (Email) {
+    return new User(uuid.v1(), Email);
+};
+
+exports.create = create;
