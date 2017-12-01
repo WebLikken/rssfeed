@@ -2,7 +2,7 @@
 
 const uuid = require('uuid');
 const AWS = require('aws-sdk');
-const AWS_CONFIG = require(__base + '/config/rest-config').SERVICE.AWS;
+const AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG;
 const feedServices = require(__base + '/services/feed-service');
 
 // Plus nécessaire à mettre dans le dossier local config
@@ -16,7 +16,7 @@ let create = (object, callback) => {
     const params = {
         TableName: AWS_CONFIG.TABLE_FEED,
         Item: {
-            feedHashId:feedServices.getHashFeedId(object),
+            feedHashID:feedServices.getHashIDFeed(object),
             IDUser: uuid.v1(),
             feeds:'tesLBO'
         },

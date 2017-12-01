@@ -6,7 +6,7 @@ AWS.config.update({region:'us-east-2'});
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-const AWS_CONFIG = require(__base + '/config/rest-config').SERVICE.AWS;
+const AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG;
 
 let create = (object, callback) => {
     const params = {

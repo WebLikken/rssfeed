@@ -1,6 +1,8 @@
 'use strict';
 
-const utiltyService = require(__base + '/services/utility-service');
+let utiltyService = require(__base + '/services/utility-service'),
+    Category = require(__base + '/model/category').Category,
+    categoryService = require(__base + '/services/category-service');
 /**
  *
  * @param opml OPLM to JSON Object
@@ -28,6 +30,31 @@ let getCategoriesAndChannels = function (opml) {
     return categoriesAndChannels;
 
 };
+let createCategories = function (opml, IDUser) {
+
+    let oplmCategories = opml.body.outline,
+        categories = [];
+
+    if (oplmCategories.length > 0) {
+        for (let i = 0; i < oplmCategories.length; i += 1) {
+            let oplmCategory = oplmCategories[i];
+            if (oplmCategory.outline && oplmCategory.outline.length > 0) {
+                let category = utiltyService.cloneSimpleOject(oplmCategory, true, false);
+                categories.push(category);
+            }
+        }
+    }
+    categoryService.createCategoriesAndSave_P(IDUser, categories)
+        .then(
+            function (data) {
+                console.log(data);
+            },
+            function (error) {
+                console.error(error);
+
+            });
+
+};
 let getAllChannels = function (opml) {
 
     let oplmCategories = opml.body.outline,
@@ -41,7 +68,7 @@ let getAllChannels = function (opml) {
                     let cloneObj = utiltyService.cloneSimpleOject(oplmCategory.outline[j], true, false);
                     allChannels.push(cloneObj);
                 }
-            } else if(oplmCategory && oplmCategory.outline) {
+            } else if (oplmCategory && oplmCategory.outline) {
                 let cloneObj = utiltyService.cloneSimpleOject(oplmCategory.outline, true, false);
                 allChannels.push(cloneObj);
             }
@@ -52,3 +79,4 @@ let getAllChannels = function (opml) {
 };
 exports.getCategoriesAndChannels = getCategoriesAndChannels;
 exports.getAllChannels = getAllChannels;
+exports.createCategories = createCategories;
