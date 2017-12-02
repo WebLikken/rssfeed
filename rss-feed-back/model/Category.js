@@ -14,11 +14,16 @@ class Category {
 }
 
 let categoryType = {
-    IDUser: "S",
-    IDCategory: "S",
-    text: "S",
-    title: "S",
-    channels: "SS"
-};
+        IDUser: "S",
+        IDCategory: "S",
+        text: "S",
+        title: "S",
+        channels: "SS"
+    },
+    CATEGORY_DEFAULT = {
+        text: 'Sans catégorie',
+        title: 'Sans catégorie'
+    };
 exports.Category = Category;
 exports.categoryType = categoryType;
+exports.CATEGORY_DEFAULT = CATEGORY_DEFAULT;

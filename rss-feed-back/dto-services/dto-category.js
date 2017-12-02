@@ -14,11 +14,8 @@ let put = (Item, callback) => {
             TableName: AWS_CONFIG.TABLE_CATEGORY,
             Item: Item
         };
-        console.log('put', JSON.stringify(Item));
 
         dynamoDbDocumentClient.put(params, (error, data) => {
-            let response;
-            // handle potential errors
             if (error) {
                 console.error(error);
             }
@@ -43,60 +40,27 @@ let put = (Item, callback) => {
         });
 
         dynamoDb.batchWriteItem(objectRequest, (error, data) => {
-            let response;
-            // handle potential errors
+
             if (error) {
                 console.error(error);
             }
             callback(error, data);
         });
     },
-    batchGetItem = (IDUser, callback) => {
+    query = (IDUser, callback) => {
         let key = 'IDUser',
-        keyType = categoryType[key];
+            params = {};
 
-        let objectRequest = {
-                RequestItems: {}
-            },
-            keyObject = {};
-        keyObject[key] = {};
-        keyObject[key][keyType] = IDUser;
-        objectRequest.RequestItems[AWS_CONFIG.TABLE_CATEGORY] = {Keys:[keyObject]};
-
-
-        /*let objectRequest = {
-            "RequestItems": {
-                "Forum": {
-                    "Keys": [
-                        {
-                            "Name": {"S": "Amazon DynamoDB"}
-                        },
-                        {
-                            "Name": {"S": "Amazon RDS"}
-                        },
-                        {
-                            "Name": {"S": "Amazon Redshift"}
-                        }
-                    ],
-                    "ProjectionExpression": "Name, Threads, Messages, Views"
-                },
-                "Thread": {
-                    "Keys": [
-                        {
-                            "ForumName": {"S": "Amazon DynamoDB"},
-                            "Subject": {"S": "Concurrent reads"}
-                        }
-                    ],
-                    "ProjectionExpression": "Tags, Message"
-                }
-            },
-            "ReturnConsumedCapacity": "TOTAL"
-        };*/
+        params.TableName = AWS_CONFIG.TABLE_CATEGORY;
+        params.KeyConditionExpression = '#' + key + ' = :' + key;
+        params.ExpressionAttributeNames = {};
+        params.ExpressionAttributeNames['#' + key] = key;
+        params.ExpressionAttributeValues = {};
+        params.ExpressionAttributeValues[':' + key] = IDUser;
 
 
-        dynamoDb.batchGetItem(objectRequest, (error, data) => {
-            let response;
-            // handle potential errors
+
+        dynamoDbDocumentClient.query(params, (error, data) => {
             if (error) {
                 console.error(error);
             }
@@ -107,4 +71,4 @@ let put = (Item, callback) => {
 
 exports.put = put;
 exports.batchWriteItem = batchWriteItem;
-exports.batchGetItem = batchGetItem;
+exports.query = query;
