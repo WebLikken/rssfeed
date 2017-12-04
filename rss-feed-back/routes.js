@@ -59,7 +59,3 @@ app.listen(3000, function () {
     console.log('Example app listening on port 3000!');
 });
 
-const getAllChannels = require(__base + '/services/oplm-service').getAllChannels;
-
-var toto = getAllChannels(require(__base + '/mock').getOplm);
-

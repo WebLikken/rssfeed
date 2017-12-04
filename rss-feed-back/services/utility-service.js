@@ -3,7 +3,7 @@
  *
  * @param obj
  * @param underscoreSuppression boolean pour remplacer le underscore du  début propriétés
- * @param copyarray boolean Copie des Array de l'objet
+ * @param copyarrayOrObject boolean Copie des Array de l'objet
  * @returns {{}}
  */
 let cloneSimpleOject = function (obj, underscoreSuppression, copyarray) {

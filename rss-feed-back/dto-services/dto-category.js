@@ -8,6 +8,7 @@ AWS.config.update({region: 'us-east-2'});
 const dynamoDbDocumentClient = new AWS.DynamoDB.DocumentClient(),
     dynamoDb = new AWS.DynamoDB();
 
+// TODO Mutualiser avec dto-channel
 
 let put = (Item, callback) => {
         let params = {

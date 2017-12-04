@@ -5,7 +5,9 @@ let dtoCategory = require(__base + 'dto-services/dto-category');
 let oplmServices = require(__base + '/services/oplm-service');
 let oplm = require(__base + '/mock').getOplm;
 
-let categories = oplmServices.createCategories(oplm,'a941c1b0-d548-11e7-b68b-2df884680a57');
+let categoriesAndChannels = oplmServices.importCategoriesAndChannels(oplm,'a941c1b0-d548-11e7-b68b-2df884680a57');
+//et allcategories = oplmServices.getAllChannels(oplm);
+//let categories = oplmServices.createCategories(oplm,'a941c1b0-d548-11e7-b68b-2df884680a57');
 
 
 //oplmServices.createChannels(oplm,'a941c1b0-d548-11e7-b68b-2df884680a57');

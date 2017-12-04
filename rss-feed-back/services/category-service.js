@@ -16,7 +16,7 @@ let getCategories = function (opml) {
     createCategoryAndSave_P = function (IDUser, _category) {
 
         return new Promise((resolve, reject) => {
-            let category = createCategory(IDUser, _category);
+            let category = createCategoryClass(IDUser, _category);
             dtoCategory.put(category, function (error, data) {
                 if (error) {
                     reject(error);
@@ -26,19 +26,24 @@ let getCategories = function (opml) {
             });
         });
     },
-    createCategory = function (IDUser, _category) {
+    createCategoryClass = function (IDUser, _category) {
         let category = new Category(IDUser);
         category.text = _category.text;
         category.title = _category.title;
+        if(_category.channels && _category.channels.length){
+            category.channels = _category.channels;
+        }
         return category;
     },
     createCategoriesAndSave_P = function (IDUser, _categories) {
-        let categories = [];
-        _categories.forEach(function (category) {
-            categories.push(createCategory(IDUser, category));
-        });
         return new Promise((resolve, reject) => {
-            dtoCategory.batchWriteItem(categories, function (error, data) {
+            var categories = [], that = this;
+            _categories.forEach(function(category){
+                categories.push(that.createCategoryClass(IDUser, category));
+            });
+            let test = [];
+            test.push(categories[13]);
+            dtoCategory.batchWriteItem(test, function (error, data) {
                 if (error) {
                     reject(error);
                 } else {
@@ -50,3 +55,4 @@ let getCategories = function (opml) {
 //exports.getFeedsFromChannel = getFeedsFromChannel;
 exports.createCategoryAndSave_P = createCategoryAndSave_P;
 exports.createCategoriesAndSave_P = createCategoriesAndSave_P;
+exports.createCategoryClass = createCategoryClass;

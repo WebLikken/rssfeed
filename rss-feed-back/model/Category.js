@@ -22,7 +22,8 @@ let categoryType = {
     },
     CATEGORY_DEFAULT = {
         text: 'Sans catégorie',
-        title: 'Sans catégorie'
+        title: 'Sans catégorie',
+        channels: []
     };
 exports.Category = Category;
 exports.categoryType = categoryType;
