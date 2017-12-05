@@ -1,10 +1,9 @@
 'use strict';
 
 let utiltyService = require(__base + '/services/utility-service'),
-    Category = require(__base + '/model/category').Category,
-    ChannelService = require(__base + '/services/channel-service'),
+    channelService = require(__base + '/services/channel-service'),
     categoryService = require(__base + '/services/category-service'),
-    CATEGORY_DEFAULT = require(__base + 'model/Category').CATEGORY_DEFAULT,
+    CetegoryDefault = require(__base + 'model/Category').CetegoryDefault,
     util = require('util');
 
 /**
@@ -15,7 +14,7 @@ let utiltyService = require(__base + '/services/utility-service'),
 let getCategoriesAndChannels = function (opml) {
 
         let oplmCategories = opml.body.outline,
-            categoriesAndChannels = [], unclassifiedCategory = CATEGORY_DEFAULT;
+            categoriesAndChannels = [], unclassifiedCategory = new CetegoryDefault();
 
         if (oplmCategories.length > 0) {
             for (let i = 0; i < oplmCategories.length; i += 1) {
@@ -55,12 +54,11 @@ let getCategoriesAndChannels = function (opml) {
             }
         });
         return channels;
-
     },
     importCategoriesAndChannels = function (opml, IDUser) {
         let channels = [], categories = [];
         this.getAllChannels(opml).forEach(function (channel) {
-            channels.push(ChannelService.createChannelClass(channel));
+            channels.push(channelService.createChannelClass(channel));
         });
 
         this.getCategoriesAndChannels(opml).forEach(function (_category) {
@@ -68,34 +66,25 @@ let getCategoriesAndChannels = function (opml) {
             category.channels = [];
             if (_category.channels && _category.channels.length > 0) {
                 _category.channels.forEach(function (_channel) {
-
                     let IDChannel;
                     for (let i = 0; i < channels.length; i += 1) {
                         let channel = channels[i];
                         if (channel.xmlUrl === _channel.xmlUrl) {
                             IDChannel = channel.IDChannel;
-                            console.log(i,IDChannel );
                             break;
                         }
                     }
-                    let isPresent = category.channels.some(
-                        function(_ID){
-                            return _ID===IDChannel;
-                        });
-                    console.log(isPresent);
                     category.channels.push(IDChannel);
                 });
             }
             categories.push(category);
         });
         categoryService.createCategoriesAndSave_P(IDUser, categories)
-            .then(
-                function (data) {
-                    console.log(data);
-                },
-                function (error) {
-                    console.error(error);
-                });
+            .then(channelService.createChannelsAndSave_P(IDUser, channels).then(function (error, data) {
+                console.log(data);
+            }, function (error) {
+                console.error(error);
+            }));
     };
 
 exports.getCategoriesAndChannels = getCategoriesAndChannels;

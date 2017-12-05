@@ -20,11 +20,11 @@ let categoryType = {
         title: "S",
         channels: "SS"
     },
-    CATEGORY_DEFAULT = {
-        text: 'Sans catégorie',
-        title: 'Sans catégorie',
-        channels: []
+    CetegoryDefault = function(){
+        this.text= 'Sans catégorie';
+        this.title= 'Sans catégorie';
+        this.channels= [];
     };
 exports.Category = Category;
 exports.categoryType = categoryType;
-exports.CATEGORY_DEFAULT = CATEGORY_DEFAULT;
+exports.CetegoryDefault = CetegoryDefault;

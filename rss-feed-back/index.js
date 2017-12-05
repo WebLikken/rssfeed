@@ -1,11 +1,14 @@
 'use strict';
 global.__base = __dirname + '/';
 require(__base + '/routes');
-let dtoCategory = require(__base + 'dto-services/dto-category');
+let AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG;
+let dto = require(__base + 'dto-services/dto-service');
 let oplmServices = require(__base + '/services/oplm-service');
 let oplm = require(__base + '/mock').getOplm;
 
-let categoriesAndChannels = oplmServices.importCategoriesAndChannels(oplm,'a941c1b0-d548-11e7-b68b-2df884680a57');
+// Importation Oplm pour user boulerluc@gmail.ccm
+oplmServices.importCategoriesAndChannels(oplm, 'a941c1b0-d548-11e7-b68b-2df884680a57');
+
 //et allcategories = oplmServices.getAllChannels(oplm);
 //let categories = oplmServices.createCategories(oplm,'a941c1b0-d548-11e7-b68b-2df884680a57');
 
@@ -14,7 +17,7 @@ let categoriesAndChannels = oplmServices.importCategoriesAndChannels(oplm,'a941c
 
 
 /*
-dtoCategory.query('a941c1b0-d548-11e7-b68b-2df884680a57', function (err, data) {
+dto.query(AWS_CONFIG.TABLE_CATEGORY, 'a941c1b0-d548-11e7-b68b-2df884680a57', function (err, data) {
     console.log(err, data);
     if (err) {
         console.error(err)
@@ -22,4 +25,5 @@ dtoCategory.query('a941c1b0-d548-11e7-b68b-2df884680a57', function (err, data) {
         oplmServices.createChannels(oplm, data.Items, 'a941c1b0-d548-11e7-b68b-2df884680a57');
 
     }
-});*/
+});
+*/

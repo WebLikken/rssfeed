@@ -1,11 +1,14 @@
 'use strict';
 
-let parser = require("rss-parser");
-let Channel = require(__base + 'model/Channel').Channel;
-let getChanel = function (url, callBack) {
-    parser.parseURL(url, callBack);
+let parser = require("rss-parser"),
+    Channel = require(__base + 'model/Channel').Channel,
+    dto = require(__base + 'dto-services/dto-service'),
+    AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG,
 
-};
+    getChanel = function (url, callBack) {
+        parser.parseURL(url, callBack);
+
+    };
 let getChannel = function (url) {
     return getChanel(url, function (err, result) {
         return result.feed;
@@ -29,19 +32,28 @@ let createChannelClass = function (_channel) {
 };
 
 let createChannelsAndSave_P = function (IDUser, _channels) {
-    return new Promise((resolve, reject) => {
-        var channels = [], that = this;
-        _channels.forEach(function(channel){
-            channels.push(that.createChannelClass(IDUser, channel));
-        });
-        dtoCategory.batchWriteItem(categories, function (error, data) {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(data);
-            }
-        });
-    });
-} ;
+    let MAX_ITEMS = AWS_CONFIG.MAX_BATCH_WRITE,
+        promises = [], that = this;
+
+    for (let i = 0; i < Math.ceil(_channels.length / MAX_ITEMS); i += 1) {
+        let channels = [];
+
+        for (let j = i * MAX_ITEMS; j < (i + 1) * MAX_ITEMS && j < _channels.length; j += 1) {
+            channels.push(that.createChannelClass(_channels[j]));
+        }
+        promises.push(new Promise((resolve, reject) => {
+
+            dto.batchWriteItem(AWS_CONFIG.TABLE_CHANNEL, channels, function (error, data) {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(data);
+                }
+            });
+        }));
+    }
+    return Promise.all(promises);
+};
 exports.getFeedsFromChannel = getFeedsFromChannel;
 exports.createChannelClass = createChannelClass;
+exports.createChannelsAndSave_P = createChannelsAndSave_P;
