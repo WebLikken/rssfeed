@@ -37,6 +37,7 @@ let createChannelsAndSave_P = function (IDUser, _channels) {
 
     for (let i = 0; i < Math.ceil(_channels.length / MAX_ITEMS); i += 1) {
         let channels = [];
+            // TODO check if channel exist
 
         for (let j = i * MAX_ITEMS; j < (i + 1) * MAX_ITEMS && j < _channels.length; j += 1) {
             channels.push(that.createChannelClass(_channels[j]));
