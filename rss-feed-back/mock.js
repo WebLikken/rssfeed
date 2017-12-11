@@ -440,13 +440,7 @@ exports.getOplm= {
                         "_xmlUrl": "http://www.cssdesignawards.com/rss.php",
                         "_htmlUrl": "https://www.cssdesignawards.com"
                     },
-                    {
-                        "_type": "rss",
-                        "_text": "KIRUPA | become a better web developer",
-                        "_title": "KIRUPA | become a better web developer",
-                        "_xmlUrl": "http://www.kirupa.com/modular/kirupa.xml",
-                        "_htmlUrl": "https://www.kirupa.com/"
-                    },
+
                     {
                         "_type": "rss",
                         "_text": "MarcySutton.com",
@@ -969,6 +963,54 @@ exports.getOplm= {
                 "_title": "Offres d'emploi Alsacréations.com (Bretagne)",
                 "_xmlUrl": "http://emploi.alsacreations.com/offres-6.xml",
                 "_htmlUrl": "https://emploi.alsacreations.com"
+            }
+        ]
+    },
+    "_version": "1.0"
+};
+exports.getSmallOplm= {
+    "head": {
+        "title": "Luc subscriptions in feedly Cloud"
+    },
+    "body": {
+        "outline": [
+            {
+                "outline": [
+                    {
+                        "_type": "rss",
+                        "_text": "Envato Tuts+ Web Design",
+                        "_title": "Envato Tuts+ Web Design",
+                        "_xmlUrl": "http://feeds.feedburner.com/webdesigntutsplus",
+                        "_htmlUrl": "https://webdesign.tutsplus.com"
+                    },
+                    {
+                        "_type": "rss",
+                        "_text": "24 ways",
+                        "_title": "24 ways",
+                        "_xmlUrl": "http://feeds.feedburner.com/24ways",
+                        "_htmlUrl": "https://24ways.org/"
+                    }
+                ],
+                "_text": "webdesign",
+                "_title": "webdesign"
+            },
+            {
+                "outline": {
+                    "_type": "rss",
+                    "_text": "CatsWhoCode",
+                    "_title": "CatsWhoCode",
+                    "_xmlUrl": "http://feeds2.feedburner.com/Catswhocode",
+                    "_htmlUrl": "https://www.catswhocode.com/blog"
+                },
+                "_text": "web development",
+                "_title": "web development"
+            },
+            {
+                "_type": "rss",
+                "_text": "Blog Du Webdesign Magazine",
+                "_title": "Blog Du Webdesign Magazine",
+                "_xmlUrl": "http://feeds.feedburner.com/blogduwebdesign/articles",
+                "_htmlUrl": "http://www.blogduwebdesign.com/"
             }
         ]
     },

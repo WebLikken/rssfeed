@@ -53,7 +53,7 @@ app.get('/rest-services/user/get/:IDUser/:Email', function(req, res, next) {
         console.log(error, response);
     });
 
-})
+});
 
 app.listen(3000, function () {
     console.log('Example app listening on port 3000!');

@@ -6,10 +6,10 @@ let uuid = require('uuid'),
 class Category {
     constructor(IDUser, IDCategory, text, title, channels) {
         this.IDUser = IDUser;
-        this.IDCategory = uuid.v1();
+        this.IDCategory = IDCategory || uuid.v1();
         this.text = text;
         this.title = title;
-        this.channels = AWS_CONFIG.EMPTY_SS;
+        this.channels = channels;
     }
 }
 
@@ -20,10 +20,10 @@ let categoryType = {
         title: "S",
         channels: "SS"
     },
-    CetegoryDefault = function(){
-        this.text= 'Sans catégorie';
-        this.title= 'Sans catégorie';
-        this.channels= [];
+    CetegoryDefault = function () {
+        this.text = 'Sans catégorie';
+        this.title = 'Sans catégorie';
+        this.channels = [];
     };
 exports.Category = Category;
 exports.categoryType = categoryType;

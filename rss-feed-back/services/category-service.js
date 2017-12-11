@@ -1,57 +1,91 @@
 'use strict';
 let Category = require(__base + 'model/Category').Category,
-    dto = require(__base + 'dto-services/dto-service'),
+    dto = require(__base + 'dto-services/dto-general-service'),
     AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG;
 
 
+let getCategories, createCategoryAndSave_P, getCategoryIfExists, createCategoryClass, saveCategories_P,
+    addChannelOnCategory,
+    getAllCategoriesByUSer;
+
+/*getCategories = function (opml) {
+    return getChanel(url, function (err, result) {
+        return result.feed;
+    });
+};*/
+createCategoryAndSave_P = function (IDUser, _category) {
+
+    return new Promise((resolve, reject) => {
+        let category = createCategoryClass(IDUser, _category);
+        dto.put(AWS_CONFIG.TABLE_CATEGORY, function (error, data) {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+};
 /**
  *
- * @param opml OPLM to JSON Object
- * @returns {Array} Of categories and
+ * @param _category
+ * @param allUserCategories
+ * @returns {Object}
  */
-let getCategories = function (opml) {
-        return getChanel(url, function (err, result) {
-            return result.feed;
-        });
-    },
-    createCategoryAndSave_P = function (IDUser, _category) {
+getCategoryIfExists = function (_category, allUserCategories) {
+    let existingCategory,
+        propertiesToCkeck = ['text', 'title'], i;
+    for (i = 0; i < allUserCategories.length; i += 1) {
+        let category = allUserCategories[i], exist;
+        for (let j = 0; j < propertiesToCkeck.length; j += 1) {
+            let prop = propertiesToCkeck[j],
+                check = category[prop] === _category[prop];
 
-        return new Promise((resolve, reject) => {
-            let category = createCategoryClass(IDUser, _category);
-            dto.put(AWS_CONFIG.TABLE_CATEGORY, function (error, data) {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(data);
-                }
-            });
-        });
-    },
-    createCategoryClass = function (IDUser, _category) {
-        let category = new Category(IDUser);
-        category.text = _category.text;
-        category.title = _category.title;
-        if (_category.channels && _category.channels.length) {
-            category.channels = _category.channels;
+            exist = typeof exist === 'undefined' ? check : exist && check;
         }
-        return category;
-    },
-    createCategoriesAndSave_P = function (IDUser, _categories) {
-        return new Promise((resolve, reject) => {
-            let categories = [], that = this;
-            _categories.forEach(function (category) {
-                categories.push(that.createCategoryClass(IDUser, category));
-            });
-            dto.batchWriteItem(AWS_CONFIG.TABLE_CATEGORY,categories, function (error, data) {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(data);
-                }
-            });
+        if (exist) {
+            return category;
+        }
+    }
+};
+createCategoryClass = function (IDUser, _category) {
+    return new Category(IDUser, _category.IDCategory, _category.text, _category.title, _category.channels);
+};
+/**
+ *
+ * @param IDUser {String}
+ * @param _categories {Array of category}
+ * @returns {Promise}
+ */
+saveCategories_P = function (categories) {
+    return new Promise((resolve, reject) => {
+
+        dto.batchWriteItem(AWS_CONFIG.TABLE_CATEGORY, categories, function (error, data) {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(data);
+            }
         });
-    };
-//exports.getFeedsFromChannel = getFeedsFromChannel;
+    });
+};
+getAllCategoriesByUSer = function (IDUser) {
+    return new Promise((resolve, reject) => {
+        dto.query(AWS_CONFIG.TABLE_CATEGORY, IDUser, function (err, data) {
+            if (err) {
+                reject(err);
+            } else {
+
+                resolve(data);
+            }
+        });
+    });
+};
+addChannelOnCategory = function () {
+
+};
 exports.createCategoryAndSave_P = createCategoryAndSave_P;
-exports.createCategoriesAndSave_P = createCategoriesAndSave_P;
+exports.saveCategories_P = saveCategories_P;
 exports.createCategoryClass = createCategoryClass;
+exports.getCategoryIfExists = getCategoryIfExists;
+exports.getAllCategoriesByUSer = getAllCategoriesByUSer;

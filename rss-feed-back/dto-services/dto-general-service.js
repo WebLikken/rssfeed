@@ -8,7 +8,12 @@ AWS.config.update({region: 'us-east-2'});
 
 const dynamoDbDocumentClient = new AWS.DynamoDB.DocumentClient(),
     dynamoDb = new AWS.DynamoDB();
-
+/**
+ * dynamoDbDocumentClient put operation
+ * @param table
+ * @param Item
+ * @param callback
+ */
 let put = (table, Item, callback) => {
         let params = {
             TableName: table,
@@ -22,6 +27,20 @@ let put = (table, Item, callback) => {
             callback(error, data);
         });
     },
+    getItem = (params, callback) => {
+        dynamoDb.getItem(params, (error, data) => {
+            if (error) {
+                console.error(error);
+            }
+            callback(error, data);
+        });
+    },
+    /**
+     * dynamoDbDocumentClient batchWriteItem operation
+     * @param table
+     * @param items
+     * @param callback
+     */
     batchWriteItem = (table, items, callback) => {
         let objectRequest = {
             RequestItems: {}
@@ -50,13 +69,22 @@ let put = (table, Item, callback) => {
             }
             objectRequest.RequestItems[table].push({PutRequest: {Item: item}});
         });
-        dynamoDb.batchWriteItem(objectRequest, (error, data) => {
-            if (error) {
-                console.error(error);
-            }
-            callback(error, data);
-        });
+        if(objectRequest.RequestItems[table].length>0){
+            dynamoDb.batchWriteItem(objectRequest, (error, data) => {
+                if (error) {
+                    console.error(error);
+                }
+                callback(error, data);
+            });
+        }
+
     },
+    /**
+     * dynamoDbDocumentClient Scan operation
+     * @param table
+     * @param IDUser
+     * @param callback
+     */
     query = (table, IDUser, callback) => {
         let key = 'IDUser',
             params = {};
@@ -75,9 +103,47 @@ let put = (table, Item, callback) => {
             }
             callback(error, data);
         });
-    }
-;
+    },
+    /**
+     * dynamoDbDocumentClient Scan operation
+     * @param table
+     * @param params
+     * @returns {Promise}
+     */
+    scan = (params) => {
+        return new Promise(function executor(resolve, reject) {
+            let dataArray = [],
+                count = 0,
+                onScan = function (err, data) {
+                    if (err) {
+                        console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
+                        reject(err);
+                    } else {
+                        data.Items.forEach(function (itemdata) {
+                            dataArray.push(itemdata);
+                        });
+
+                        // continue scanning if we have more items
+                        if (typeof data.LastEvaluatedKey !== "undefined") {
+                            console.log("Scanning for more...");
+                            params.ExclusiveStartKey = data.LastEvaluatedKey;
+                            dynamoDbDocumentClient.scan(params, onScan);
+                        } else {
+                            resolve(dataArray);
+                        }
+                    }
+                };
+            dynamoDbDocumentClient.scan(params, onScan);
+        });
+
+    },
+    convertDynamoDBRecordToJSObject = (dynamoDbRecord) => {
+        return AWS.DynamoDB.Converter.output(dynamoDbRecord);
+    };
 
 exports.put = put;
 exports.batchWriteItem = batchWriteItem;
 exports.query = query;
+exports.scan = scan;
+exports.getItem = getItem;
+exports.convertDynamoDBRecordToJSObject = convertDynamoDBRecordToJSObject;
