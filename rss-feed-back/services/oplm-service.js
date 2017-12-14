@@ -81,7 +81,7 @@ importCategoriesAndChannels = function (opml, IDUser) {
 
 
 // Validation flux channels
-    this.validateChannels_p(opml, IDUser).then(function (allChannels) {
+    this.importValidatedChannels_p(opml, IDUser).then(function (allChannels) {
         allChannels.forEach(function (channelValidation) {
             if (!channelValidation.error) {
                 validatedChannels.push(channelValidation.channel);
@@ -191,7 +191,6 @@ importValidatedChannels_p = function (opml, IDUser) {
 };
 
 exports.getCategoriesAndChannels = getCategoriesAndChannels;
-exports.importCategoriesAndChannels = importCategoriesAndChannels;
-exports.validateChannels_p = importValidatedChannels_p;
 exports.getAllChannels = getAllChannels;
-exports.validateChannels_p = importValidatedChannels_p;
+exports.importCategoriesAndChannels = importCategoriesAndChannels;
+exports.importValidatedChannels_p = importValidatedChannels_p;

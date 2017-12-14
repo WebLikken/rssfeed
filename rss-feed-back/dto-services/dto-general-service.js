@@ -2,7 +2,8 @@
 const AWS = require('aws-sdk');
 const AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG,
     channelType = require(__base + 'model/Channel').channelType,
-    categoryType = require(__base + 'model/Category').categoryType;
+    categoryType = require(__base + 'model/Category').categoryType,
+    feedType = require(__base + 'model/Feed').feedType;
 
 AWS.config.update({region: 'us-east-2'});
 
@@ -53,6 +54,9 @@ let put = (table, Item, callback) => {
             case  AWS_CONFIG.TABLE_CHANNEL:
                 types = channelType;
                 break;
+            case  AWS_CONFIG.TABLE_FEED:
+                types = feedType;
+                break;
         }
         objectRequest.RequestItems[table] = [];
         items.forEach(function (_item) {
@@ -69,7 +73,7 @@ let put = (table, Item, callback) => {
             }
             objectRequest.RequestItems[table].push({PutRequest: {Item: item}});
         });
-        if(objectRequest.RequestItems[table].length>0){
+        if (objectRequest.RequestItems[table].length > 0) {
             dynamoDb.batchWriteItem(objectRequest, (error, data) => {
                 if (error) {
                     console.error(error);

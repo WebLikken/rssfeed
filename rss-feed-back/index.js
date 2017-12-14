@@ -5,13 +5,15 @@ let AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG;
 let dto = require(__base + 'dto-services/dto-general-service');
 let oplmServices = require(__base + '/services/oplm-service');
 //let categoryServices = require(__base + '/services/category-service');
+let feedServices = require(__base + '/services/feed-service');
 let channelServices = require(__base + '/services/channel-service');
+let moteurServices = require(__base + '/services/moteur-service');
 let oplm = require(__base + '/mock').getOplm;
 let smallOplm = require(__base + '/mock').getSmallOplm;
 var feed = require("feed-read");
 // Importation Oplm pour user boulerluc@gmail.ccm
-oplmServices.importCategoriesAndChannels(oplm, 'a941c1b0-d548-11e7-b68b-2df884680a57');
-
+//oplmServices.importCategoriesAndChannels(oplm, 'a941c1b0-d548-11e7-b68b-2df884680a57');
+moteurServices.moteurRoule();
 // Récupération d'un channel
 /*
 let params1 = {
