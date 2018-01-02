@@ -1,9 +1,10 @@
 'use strict';
-const AWS = require('aws-sdk');
-const AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG,
-    channelType = require(__base + 'model/Channel').channelType,
-    categoryType = require(__base + 'model/Category').categoryType,
-    feedType = require(__base + 'model/Feed').feedType;
+let AWS = require('aws-sdk');
+let AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG;
+let channelType = require(__base + 'model/Channel').channelType;
+let categoryType = require(__base + 'model/Category').categoryType;
+let feedType = require(__base + 'model/Feed').feedType;
+let attr = require('dynamodb-data-types').AttributeValue;
 
 AWS.config.update({region: 'us-east-2'});
 
@@ -23,7 +24,15 @@ let put = (table, Item, callback) => {
 
         dynamoDbDocumentClient.put(params, (error, data) => {
             if (error) {
-                console.error(error);
+                console.log(error);
+            }
+            callback(error, data);
+        });
+    },
+    update = (params, callback) => {
+        dynamoDbDocumentClient.update(params, (error, data) => {
+            if (error) {
+                console.log(error);
             }
             callback(error, data);
         });
@@ -31,7 +40,7 @@ let put = (table, Item, callback) => {
     getItem = (params, callback) => {
         dynamoDb.getItem(params, (error, data) => {
             if (error) {
-                console.error(error);
+                console.log(error);
             }
             callback(error, data);
         });
@@ -67,7 +76,16 @@ let put = (table, Item, callback) => {
                     // Les propriétés dont leurs valeurs sont undefined ne sont pas ajoutées
                     if (_item[property]) {
                         item[property] = {};
-                        item[property][typeKey] = _item[property];
+                        if (typeKey === 'S') {
+                            item[property][typeKey] = _item[property].toString();
+
+                        } else if (typeKey === "M") {
+                            item[property][typeKey] = attr.wrap(_item[property]);
+
+                        } else {
+                            item[property][typeKey] = _item[property];
+
+                        }
                     }
                 }
             }
@@ -76,7 +94,7 @@ let put = (table, Item, callback) => {
         if (objectRequest.RequestItems[table].length > 0) {
             dynamoDb.batchWriteItem(objectRequest, (error, data) => {
                 if (error) {
-                    console.error(error);
+                    console.log(error);
                 }
                 callback(error, data);
             });
@@ -89,65 +107,101 @@ let put = (table, Item, callback) => {
      * @param IDUser
      * @param callback
      */
-    query = (table, IDUser, callback) => {
-        let key = 'IDUser',
-            params = {};
+    query = (params) => {
 
-        params.TableName = table;
-        params.KeyConditionExpression = '#' + key + ' = :' + key;
-        params.ExpressionAttributeNames = {};
-        params.ExpressionAttributeNames['#' + key] = key;
-        params.ExpressionAttributeValues = {};
-        params.ExpressionAttributeValues[':' + key] = IDUser;
-
-
-        dynamoDbDocumentClient.query(params, (error, data) => {
-            if (error) {
-                console.error(error);
-            }
-            callback(error, data);
-        });
-    },
-    /**
-     * dynamoDbDocumentClient Scan operation
-     * @param table
-     * @param params
-     * @returns {Promise}
-     */
-    scan = (params) => {
-        return new Promise(function executor(resolve, reject) {
-            let dataArray = [],
-                count = 0,
-                onScan = function (err, data) {
-                    if (err) {
-                        console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
-                        reject(err);
-                    } else {
-                        data.Items.forEach(function (itemdata) {
-                            dataArray.push(itemdata);
-                        });
-
-                        // continue scanning if we have more items
-                        if (typeof data.LastEvaluatedKey !== "undefined") {
-                            console.log("Scanning for more...");
-                            params.ExclusiveStartKey = data.LastEvaluatedKey;
-                            dynamoDbDocumentClient.scan(params, onScan);
-                        } else {
-                            resolve(dataArray);
-                        }
-                    }
-                };
-            dynamoDbDocumentClient.scan(params, onScan);
+        return new Promise(function (resolve, reject) {
+            dynamoDbDocumentClient.query(params, (error, data) => {
+                if (!error) {
+                    resolve(data);
+                } else {
+                    reject(error);
+                }
+            });
         });
 
-    },
-    convertDynamoDBRecordToJSObject = (dynamoDbRecord) => {
-        return AWS.DynamoDB.Converter.output(dynamoDbRecord);
+
     };
+/**
+ * dynamoDbDocumentClient Scan operation
+ * @param table
+ * @param params
+ * @returns {Promise}
+ */
+let scan = function (params) {
+    return new Promise(function (resolve, reject) {
+        let dataArray = [];
+
+        function onScan(err, data) {
+            if (err) {
+                console.log("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
+                reject(err);
+            } else {
+                data.Items.forEach(function (itemdata) {
+                    dataArray.push(itemdata);
+                });
+
+                // continue scanning if we have more items
+                if (typeof data.LastEvaluatedKey !== "undefined") {
+                    console.log("Scanning for more...");
+                    params.ExclusiveStartKey = data.LastEvaluatedKey;
+                    dynamoDbDocumentClient.scan(params, onScan);
+                } else {
+                    resolve(dataArray);
+                }
+            }
+        }
+
+        dynamoDbDocumentClient.scan(params, onScan);
+    });
+
+};
+let deleteTable = function (table) {
+    return new Promise(function (resolve, reject) {
+        let params = {
+            TableName: table
+        };
+
+        dynamoDb.deleteTable(params, function (err, data) {
+            resolve(err, data);
+        });
+    });
+};
+let waitingStatusTableActive = function (table, redirectCount) {
+    redirectCount = redirectCount || 0;
+    if (redirectCount > 1000) {
+        throw new Error("Redirected too many times.");
+    }
+
+    return new Promise(function (resolve) {
+        let params = {
+            TableName: table
+        };
+        dynamoDb.describeTable(params, function (err, data) {
+            resolve({err: err, data: data});
+        });
+    }).then(function (result) {
+        if (result.err) {
+            return result.err.message;
+        }
+        let tableStatus = '';
+        if (result.data && result.data && result.data.Table && result.data.Table.TableStatus) {
+            tableStatus = result.data.Table.TableStatus;
+            console.log(table, ', status : ', tableStatus);
+
+        }
+        if (tableStatus === '' || tableStatus === 'CREATING' || tableStatus === 'DELETING') {
+            return waitingStatusTableActive(table, redirectCount + 1);
+        } else {
+            return result.data.Table.TableStatus;
+        }
+    });
+};
 
 exports.put = put;
+exports.update = update;
 exports.batchWriteItem = batchWriteItem;
 exports.query = query;
 exports.scan = scan;
 exports.getItem = getItem;
-exports.convertDynamoDBRecordToJSObject = convertDynamoDBRecordToJSObject;
+exports.deleteTable = deleteTable;
+exports.waitingStatusTableActive = waitingStatusTableActive;

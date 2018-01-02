@@ -50,7 +50,7 @@ app.post('/rest-services/user/create/', user.create);
 app.get('/rest-services/user/get/:IDUser/:Email', function(req, res, next) {
     const get = require(__base + '/rest-services/user/get').get;
     get(req.params, function (error, response) {
-        console.log(error, response);
+        console.log(response);
     });
 
 });

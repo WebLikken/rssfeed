@@ -24,7 +24,7 @@ exports.user = {
     get: function (req, res, next) {
         const get = require(__base + '/rest-services/user/get').get;
         get(req.params, function (error, response) {
-            console.log(error, response);
+            console.log(response);
         });
     }
 };

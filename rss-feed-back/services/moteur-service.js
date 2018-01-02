@@ -2,40 +2,39 @@
 
 let channelService = require(__base + '/services/channel-service');
 let feedService = require(__base + '/services/feed-service');
-let moteurRoule = function () {
-    let feeds = [];
-    channelService.getAllChannels_p().then(function (_allChannels) {
-        //A suuprimer
-        let allChannels = [];
-        allChannels.push(_allChannels[0]);
-        allChannels.push(_allChannels[1]);
-        //A suuprimer
 
-
-        let promises = [];
-        allChannels.forEach(function (channel) {
-            promises.push(new Promise(function (resolve) {
-                feedService.createFeedObjects_P(channel).then(function (result) {
-                    resolve(result);
-                });
-            }));
-        });
-        Promise.all(promises).then(function (retour) {
-            let feeds = [];
-            retour.forEach(function (channel) {
-                channel.feeds.forEach(function (feed) {
-                    feeds.push(feed);
-                });
+let moteurRoule, saveFeedsForChannel_p;
+moteurRoule = function () {
+    channelService.getAllChannels_p().then(
+        function (allChannels) {
+            let promises = [];
+            console.log(allChannels.length);
+            allChannels.forEach(function (channel) {
+                promises.push(saveFeedsForChannel_p(channel));
             });
-
-            feedService.saveFeeds_P(feeds).then(function (response) {
-                console.log(response);
-            }, function (err) {
+            Promise.all(promises).then(
+                function (retour) {
+                    console.log(retour);
+                }, function (error) {
+                    console.log(error);
+                });
+        });
+};
+saveFeedsForChannel_p = function (channel) {
+    return new Promise(function (resolve, reject) {
+        feedService.createFeedObjects_P(channel).then(
+            function (result) {
+                console.log('moteur-service - saveFeedsForChannel_p', JSON.stringify(channel));
+                feedService.saveFeeds_P(result.feeds, channel).then(
+                    function (response) {
+                        resolve(response);
+                        console.log(response);
+                    });
+            },
+            function (err) {
                 console.log(err);
+                reject(err);
             });
-
-        });
     });
 };
-
 exports.moteurRoule = moteurRoule;

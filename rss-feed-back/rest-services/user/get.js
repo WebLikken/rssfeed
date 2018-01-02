@@ -17,7 +17,7 @@ let get = function(_params, callback) {
     dynamoDb.get(params, (error, result) => {
         // handle potential errors
         if (error) {
-            console.error(error);
+            console.log(error);
             callback(null, {
                 statusCode: error.statusCode || 501,
                 headers: {'Content-Type': 'text/plain'},

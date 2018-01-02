@@ -5,8 +5,8 @@ let uuid = require('uuid'),
 
 class Category {
     constructor(IDUser, IDCategory, text, title, channels) {
-        this.IDUser = IDUser;
-        this.IDCategory = IDCategory || uuid.v1();
+        this.IDUser = IDUser; //Clé de partition primaire
+        this.IDCategory = IDCategory || uuid.v1(); //Clé de tri primaire
         this.text = text;
         this.title = title;
         this.channels = channels;

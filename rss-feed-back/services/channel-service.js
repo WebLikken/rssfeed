@@ -1,14 +1,18 @@
 'use strict';
 
-let parser = require("rss-parser"),
-    Channel = require(__base + 'model/Channel').Channel,
-    dto = require(__base + 'dto-services/dto-general-service'),
-    AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG,
+let parser = require("rss-parser");
+let Channel = require(__base + 'model/Channel').Channel;
+let Dto = require(__base + 'dto-services/dto-general-service');
+let CategoryService = require(__base + 'services/category-service');
+let FeedService = require(__base + 'services/feed-service');
+let AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG;
+let AWS = require('aws-sdk');
+let dynamoDbDocumentClient = new AWS.DynamoDB.DocumentClient();
+let dynamoDb = new AWS.DynamoDB();
 
-    getChanel = function (url, callBack) {
-        parser.parseURL(url, callBack);
-
-    };
+let getChanel = function (url, callBack) {
+    parser.parseURL(url, callBack);
+};
 /*let getChannel = function (url) {
     return getChanel(url, function (err, result) {
         return result.feed;
@@ -73,8 +77,8 @@ let saveChannels_P = function (IDUser, _channels) {
         }
         promises.push(new Promise((resolve, reject) => {
 
-            dto.batchWriteItem(AWS_CONFIG.TABLE_CHANNEL, channels, function (error, data) {
-                    resolve({data:data, error:error});
+            Dto.batchWriteItem(AWS_CONFIG.TABLE_CHANNEL, channels, function (error, data) {
+                resolve({data: data, error: error});
             });
         }));
     }
@@ -89,8 +93,71 @@ let getAllChannels_p = function () {
         let params = {
             TableName: AWS_CONFIG.TABLE_CHANNEL
         };
-        dto.scan(params).then(function (channels) {
+        Dto.scan(params).then(function (channels) {
             resolve(channels);
+        }, function (erreur) {
+            reject(erreur);
+        });
+    });
+};
+let getAllChannelsByUser_p = function (IDUser) {
+    return new Promise((resolve, reject) => {
+        let categories = CategoryService.getAllCategoriesByUSer_P(IDUser).then(
+            function (categories) {
+                let allChannels = [];
+                categories.forEach(function (category) {
+                    category.channels.values.forEach(function (channel) {
+                        allChannels.push(channel);
+                    });
+                });
+                resolve(allChannels);
+            },
+            function (error) {
+                reject(error);
+            });
+    });
+};
+let createChannelFeedsPublishedDate_P = function (_channel) {
+    return new Promise((resolve, reject) => {
+
+        let channel = {
+            IDChannel: '5f163307-e362-11e7-8233-adb7ddae34f8'
+        };
+        channel.publishedFeed = [];
+        let params = {
+            TableName: AWS_CONFIG.TABLE_FEED,
+            KeyConditionExpression: "#IDChannel = :IDChannel",
+            ExpressionAttributeNames: {
+                "#IDChannel": "IDChannel"
+            },
+            ExpressionAttributeValues: {
+                ":IDChannel": channel.IDChannel
+            }
+        };
+        Dto.query(params).then(function (channels) {
+            channels.Items.forEach(function (feed) {
+                channel.publishedFeed.push(feed.published);
+            });
+            let params = {
+                ExpressionAttributeValues: {
+                    ":PF": dynamoDbDocumentClient.createSet(channel.publishedFeed),
+                },
+                Key: {
+                    "IDChannel": channel.IDChannel
+                },
+                ReturnValues: "ALL_NEW",
+                TableName: AWS_CONFIG.TABLE_CHANNEL,
+                UpdateExpression: "ADD publishedFeed :PF"
+            };
+            Dto.update(params, function (error, data) {
+                if (!error) {
+                    resolve(data);
+                } else {
+                    reject(error);
+                }
+            });
+
+
         }, function (erreur) {
             reject(erreur);
         });
@@ -102,3 +169,5 @@ exports.saveChannels_P = saveChannels_P;
 exports.getAllChannels_p = getAllChannels_p;
 exports.getChannelIfExists = getChannelIfExists;
 exports.getChanel = getChanel;
+exports.getAllChannelsByUser_p = getAllChannelsByUser_p;
+exports.createChannelFeedsPublishedDate_P = createChannelFeedsPublishedDate_P;

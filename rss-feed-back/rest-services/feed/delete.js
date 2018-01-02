@@ -16,7 +16,7 @@ module.exports.delete = (event, context, callback) => {
     dynamoDb.delete(params, (error) => {
         // handle potential errors
         if (error) {
-            console.error(error);
+            console.log(error);
             callback(null, {
                 statusCode: error.statusCode || 501,
                 headers: { 'Content-Type': 'text/plain' },

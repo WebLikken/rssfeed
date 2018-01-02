@@ -1,12 +1,12 @@
 'use strict';
-let Category = require(__base + 'model/Category').Category,
-    dto = require(__base + 'dto-services/dto-general-service'),
-    AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG;
+let Category = require(__base + 'model/Category').Category;
+let dto = require(__base + 'dto-services/dto-general-service');
+let AWS_CONFIG = require(__base + '/config/dto-config').AWS_CONFIG;
 
 
 let getCategories, createCategoryAndSave_P, getCategoryIfExists, createCategoryClass, saveCategories_P,
     addChannelOnCategory,
-    getAllCategoriesByUSer;
+    getAllCategoriesByUSer_P;
 
 /*getCategories = function (opml) {
     return getChanel(url, function (err, result) {
@@ -33,8 +33,7 @@ createCategoryAndSave_P = function (IDUser, _category) {
  * @returns {Object}
  */
 getCategoryIfExists = function (_category, allUserCategories) {
-    let existingCategory,
-        propertiesToCkeck = ['text', 'title'], i;
+    let propertiesToCkeck = ['text', 'title'], i;
     for (i = 0; i < allUserCategories.length; i += 1) {
         let category = allUserCategories[i], exist;
         for (let j = 0; j < propertiesToCkeck.length; j += 1) {
@@ -69,16 +68,24 @@ saveCategories_P = function (categories) {
         });
     });
 };
-getAllCategoriesByUSer = function (IDUser) {
+getAllCategoriesByUSer_P = function (IDUser) {
     return new Promise((resolve, reject) => {
-        dto.query(AWS_CONFIG.TABLE_CATEGORY, IDUser, function (err, data) {
-            if (err) {
-                reject(err);
-            } else {
+        let key = 'IDUser';
+        let params = {};
 
-                resolve(data);
-            }
+        params.TableName = AWS_CONFIG.TABLE_CATEGORY;
+        params.KeyConditionExpression = '#' + key + ' = :' + key;
+        params.ExpressionAttributeNames = {};
+        params.ExpressionAttributeNames['#' + key] = key;
+        params.ExpressionAttributeValues = {};
+        params.ExpressionAttributeValues[':' + key] = IDUser;
+
+        dto.query(params).then(function (data) {
+            resolve(data.Items);
+        }, function (err) {
+            reject(err);
         });
+
     });
 };
 addChannelOnCategory = function () {
@@ -88,4 +95,4 @@ exports.createCategoryAndSave_P = createCategoryAndSave_P;
 exports.saveCategories_P = saveCategories_P;
 exports.createCategoryClass = createCategoryClass;
 exports.getCategoryIfExists = getCategoryIfExists;
-exports.getAllCategoriesByUSer = getAllCategoriesByUSer;
+exports.getAllCategoriesByUSer_P = getAllCategoriesByUSer_P;

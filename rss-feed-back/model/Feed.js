@@ -3,31 +3,27 @@
 
 class Feed {
     constructor(IDChannel, title, content, published, author, link, feed) {
-        this.IDChannel = IDChannel;
-        this.published = published;
-        this.IDFeed = this.IDChannel + '_' + this.published;
+        this.IDChannel = IDChannel; //Clé de partition primaire
+        this.published = new Date(published).getTime();  //Clé de tri primaire
         this.title = title;
         this.content = content;
         this.author = author;
         this.link = link;
         this.feed = feed;
         if (typeof published === 'undefined') {
-            console.warn('published non renseigné pour feed : ', IDChannel, title, content, published, author, link, feed);
+            console.log('published non renseigné pour feed : ', IDChannel, title, content, published, author, link, feed);
         }
     }
 };
 let feedType = {
-    published: "S",
     IDChannel: "S",
-    IDFeed: "S",
+    published: "S",
     title: "S",
     content: "S",
     author: "S",
     link: "S",
-    feed : "M"
-
-}
-;
+    feed: "M"
+};
 
 exports.Feed = Feed;
 exports.feedType = feedType;

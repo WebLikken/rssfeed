@@ -65,6 +65,7 @@ exports.getFeeds = [{
         "name": "Xul.fr: Tutorials and Applications of the Web 2.0"
     }
 }];
+
 exports.getOplm= {
     "head": {
         "title": "Luc subscriptions in feedly Cloud"
@@ -106,13 +107,6 @@ exports.getOplm= {
                         "_title": "Télérama.fr - Cinéma",
                         "_xmlUrl": "http://www.telerama.fr/rss/cinema.xml",
                         "_htmlUrl": "http://www.telerama.fr/"
-                    },
-                    {
-                        "_type": "rss",
-                        "_text": "Toutes les news Séries",
-                        "_title": "Toutes les news Séries",
-                        "_xmlUrl": "http://rss.allocine.fr/ac/actualites/series",
-                        "_htmlUrl": "http://www.allocine.fr"
                     }
                 ],
                 "_text": "Cinema",
@@ -272,13 +266,6 @@ exports.getOplm= {
                         "_title": "All Angular Podcasts by Devchat.tv",
                         "_xmlUrl": "http://feeds.feedwrench.com/AdventuresInAngular.rss",
                         "_htmlUrl": "http://devchat.tv"
-                    },
-                    {
-                        "_type": "rss",
-                        "_text": "Technology Blog",
-                        "_title": "Technology Blog",
-                        "_xmlUrl": "http://www.syntaxsuccess.com/rss",
-                        "_htmlUrl": "http://www.syntaxsuccess.com/"
                     },
                     {
                         "_type": "rss",
@@ -956,61 +943,6 @@ exports.getOplm= {
                 "_title": "Alsacreations.com - Actualités",
                 "_xmlUrl": "http://www.alsacreations.com/rss/actualites.xml",
                 "_htmlUrl": "https://www.alsacreations.com/"
-            },
-            {
-                "_type": "rss",
-                "_text": "Offres d'emploi Alsacréations.com (Bretagne)",
-                "_title": "Offres d'emploi Alsacréations.com (Bretagne)",
-                "_xmlUrl": "http://emploi.alsacreations.com/offres-6.xml",
-                "_htmlUrl": "https://emploi.alsacreations.com"
-            }
-        ]
-    },
-    "_version": "1.0"
-};
-exports.getSmallOplm= {
-    "head": {
-        "title": "Luc subscriptions in feedly Cloud"
-    },
-    "body": {
-        "outline": [
-            {
-                "outline": [
-                    {
-                        "_type": "rss",
-                        "_text": "Envato Tuts+ Web Design",
-                        "_title": "Envato Tuts+ Web Design",
-                        "_xmlUrl": "http://feeds.feedburner.com/webdesigntutsplus",
-                        "_htmlUrl": "https://webdesign.tutsplus.com"
-                    },
-                    {
-                        "_type": "rss",
-                        "_text": "24 ways",
-                        "_title": "24 ways",
-                        "_xmlUrl": "http://feeds.feedburner.com/24ways",
-                        "_htmlUrl": "https://24ways.org/"
-                    }
-                ],
-                "_text": "webdesign",
-                "_title": "webdesign"
-            },
-            {
-                "outline": {
-                    "_type": "rss",
-                    "_text": "CatsWhoCode",
-                    "_title": "CatsWhoCode",
-                    "_xmlUrl": "http://feeds2.feedburner.com/Catswhocode",
-                    "_htmlUrl": "https://www.catswhocode.com/blog"
-                },
-                "_text": "web development",
-                "_title": "web development"
-            },
-            {
-                "_type": "rss",
-                "_text": "Blog Du Webdesign Magazine",
-                "_title": "Blog Du Webdesign Magazine",
-                "_xmlUrl": "http://feeds.feedburner.com/blogduwebdesign/articles",
-                "_htmlUrl": "http://www.blogduwebdesign.com/"
             }
         ]
     },
